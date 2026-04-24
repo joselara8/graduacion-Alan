@@ -56,9 +56,10 @@
 
   .wrapper {
     position: relative; z-index: 1;
-    max-width: 680px;
+    max-width: 700px;
     margin: 0 auto;
-    padding: 0 20px 60px;
+    padding: 0 24px 60px;
+    overflow-x: hidden;
   }
 
   /* ── líneas decorativas ── */
@@ -83,6 +84,7 @@
   .hero {
     text-align: center;
     padding: 60px 0 40px;
+    overflow: hidden;
     animation: fadeDown .9s ease both;
   }
   .hero-eyebrow {
@@ -97,10 +99,12 @@
   }
   .hero-title {
     font-family: 'Cinzel', serif;
-    font-size: clamp(52px, 14vw, 96px);
+    font-size: clamp(38px, 9vw, 72px);
     font-weight: 700;
-    letter-spacing: .04em;
+    letter-spacing: .02em;
     line-height: 1;
+    word-break: keep-all;
+    white-space: nowrap;
     background: linear-gradient(135deg, var(--silver-light) 0%, var(--gold-light) 40%, var(--silver) 70%, var(--gold) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -544,9 +548,36 @@
   <div class="card rsvp-card" style="animation-delay:.5s">
     <p class="card-label">✦ &nbsp;Confirma tu Asistencia &nbsp;✦</p>
     <div class="deco-line" style="margin-bottom:24px"><div class="deco-diamond"></div></div>
-    <p class="rsvp-deadline">Tienes hasta el</p>
-    <p class="rsvp-date">20 de Mayo de 2025</p>
-    <p class="rsvp-note">Es importante confirmar tu asistencia a la brevedad.<br>Tu lugar depende de tu confirmación.</p>
+
+    <!-- Mini contador RSVP -->
+    <div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.22);border-radius:10px;padding:14px 20px;margin-bottom:28px;">
+      <p style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;color:var(--gold);margin-bottom:10px;opacity:.85;">⚠ &nbsp;CONFIRMA ANTES DEL 20 DE MAYO DE 2025</p>
+      <div style="display:flex;justify-content:center;align-items:center;gap:10px;">
+        <div style="text-align:center;min-width:38px;">
+          <span style="font-family:'Cinzel',serif;font-size:24px;color:var(--silver);display:block;line-height:1;" id="r-days">--</span>
+          <span style="font-size:9px;letter-spacing:2px;color:var(--silver-dark);">DÍAS</span>
+        </div>
+        <span style="font-family:'Cinzel',serif;font-size:24px;color:var(--silver-dark);line-height:1;">:</span>
+        <div style="text-align:center;min-width:38px;">
+          <span style="font-family:'Cinzel',serif;font-size:24px;color:var(--silver);display:block;line-height:1;" id="r-hours">--</span>
+          <span style="font-size:9px;letter-spacing:2px;color:var(--silver-dark);">HRS</span>
+        </div>
+        <span style="font-family:'Cinzel',serif;font-size:24px;color:var(--silver-dark);line-height:1;">:</span>
+        <div style="text-align:center;min-width:38px;">
+          <span style="font-family:'Cinzel',serif;font-size:24px;color:var(--silver);display:block;line-height:1;" id="r-mins">--</span>
+          <span style="font-size:9px;letter-spacing:2px;color:var(--silver-dark);">MIN</span>
+        </div>
+        <span style="font-family:'Cinzel',serif;font-size:24px;color:var(--silver-dark);line-height:1;">:</span>
+        <div style="text-align:center;min-width:38px;">
+          <span style="font-family:'Cinzel',serif;font-size:24px;color:var(--silver);display:block;line-height:1;" id="r-secs">--</span>
+          <span style="font-size:9px;letter-spacing:2px;color:var(--silver-dark);">SEG</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contador grande: graduación -->
+    <p style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--silver-dark);margin-bottom:6px;">Faltan para la gran noche</p>
+    <p style="font-family:'Cinzel',serif;font-size:clamp(16px,4vw,22px);color:var(--gold-light);margin-bottom:22px;letter-spacing:2px;">Viernes 4 de Julio · 9:00 PM</p>
 
     <div class="countdown">
       <div class="cd-block">
@@ -567,12 +598,14 @@
       </div>
     </div>
 
-    <div class="btn-row">
-      <a class="btn btn-silver"
-         href="https://docs.google.com/forms/d/e/1FAIpQLSepuPHtjZA4K8lCFuz4L0QndXPxx1D2QNTU2ucvpRcw74OE3g/viewform?usp=dialog"
-         target="_blank" rel="noopener">
-        ✓ &nbsp;Confirmar Asistencia
-      </a>
+    <div style="margin-top:28px;">
+      <div class="btn-row">
+        <a class="btn btn-silver"
+           href="https://docs.google.com/forms/d/e/1FAIpQLSepuPHtjZA4K8lCFuz4L0QndXPxx1D2QNTU2ucvpRcw74OE3g/viewform?usp=dialog"
+           target="_blank" rel="noopener">
+          ✓ &nbsp;Confirmar Asistencia
+        </a>
+      </div>
     </div>
   </div>
 
@@ -587,27 +620,40 @@
 </div><!-- /wrapper -->
 
 <script>
-  // countdown hacia la fecha de la graduación
-  const eventDate = new Date('2025-07-04T21:00:00');
+  const rsvpDate  = new Date('2025-05-20T23:59:59');
+  const gradDate  = new Date('2025-07-04T21:00:00');
+
+  const rsvpBlock = document.getElementById('rsvp-block');
+  const gradBlock = document.getElementById('grad-block');
 
   function tick() {
     const now  = new Date();
-    const diff = eventDate - now;
-    if (diff <= 0) {
-      document.getElementById('cd-days').textContent  = '¡YA!';
-      document.getElementById('cd-hours').textContent = '';
-      document.getElementById('cd-mins').textContent  = '';
-      document.getElementById('cd-secs').textContent  = '';
-      return;
+
+    // ¿Ya pasó el límite de confirmación?
+    if (now > rsvpDate) {
+      rsvpBlock.style.display = 'none';
+      gradBlock.style.display = 'block';
+      const diff = gradDate - now;
+      if (diff <= 0) {
+        document.getElementById('gd-days').textContent  = '0';
+        document.getElementById('gd-hours').textContent = '0';
+        document.getElementById('gd-mins').textContent  = '0';
+        document.getElementById('gd-secs').textContent  = '0';
+        return;
+      }
+      document.getElementById('gd-days').textContent  = String(Math.floor(diff/86400000)).padStart(2,'0');
+      document.getElementById('gd-hours').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+      document.getElementById('gd-mins').textContent  = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+      document.getElementById('gd-secs').textContent  = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    } else {
+      rsvpBlock.style.display = 'block';
+      gradBlock.style.display = 'none';
+      const diff = rsvpDate - now;
+      document.getElementById('cd-days').textContent  = String(Math.floor(diff/86400000)).padStart(2,'0');
+      document.getElementById('cd-hours').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+      document.getElementById('cd-mins').textContent  = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+      document.getElementById('cd-secs').textContent  = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
     }
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000)  /   60000);
-    const s = Math.floor((diff %   60000)  /    1000);
-    document.getElementById('cd-days').textContent  = String(d).padStart(2,'0');
-    document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
-    document.getElementById('cd-mins').textContent  = String(m).padStart(2,'0');
-    document.getElementById('cd-secs').textContent  = String(s).padStart(2,'0');
   }
   tick();
   setInterval(tick, 1000);
